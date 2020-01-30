@@ -1,6 +1,7 @@
 package com.android.koejahan.model;
 
 
+import javax.crypto.SecretKey;
 
 public class Message{
     public String idSender;
@@ -10,4 +11,5 @@ public class Message{
     public byte[] tmp_key;
     public long timestamp;
     public String enc_key;
+    public SecretKey skey;
 }

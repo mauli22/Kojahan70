@@ -98,9 +98,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         newMessage.idReceiver = (String) mapMessage.get("idReceiver");
                         newMessage.tmp_key = Base64.decode(String.valueOf(mapMessage.get("enc_key")),Base64.DEFAULT);
                         newMessage.tmp_text =  Base64.decode(String.valueOf(mapMessage.get("text")),Base64.DEFAULT);
+                        newMessage.skey = new SecretKeySpec(newMessage.tmp_key, 0, newMessage.tmp_key.length, "AES" );
                         Log.d("Pesan enkripsi","text diluar if "+newMessage.tmp_text);
                         try{
-                            newMessage.text = new String(AES.decrypt(newMessage.tmp_key,newMessage.tmp_text));
+                            newMessage.text = AES.AESDecryption(newMessage.tmp_text,newMessage.skey);
                             newMessage.timestamp = (long) mapMessage.get("timestamp");
                             consersation.getListMessageData().add(newMessage);
                             adapter.notifyDataSetChanged();
