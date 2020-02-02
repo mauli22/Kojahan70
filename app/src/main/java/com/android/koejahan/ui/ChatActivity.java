@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.koejahan.CryptoLib.AES;
@@ -41,6 +42,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
@@ -52,11 +56,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<CharSequence> idFriend;
     private Consersation consersation;
     private ImageButton btnSend;
-    private EditText editWriteMessage;
+    private EmojiconEditText editWriteMessage;
+    private ImageView emojiImageView;
     private LinearLayoutManager linearLayoutManager;
     public static HashMap<String, Bitmap> bitmapAvataFriend;
     public Bitmap bitmapAvataUser;
     private SecretKey kuncisimetris;
+    private View rootView;
+    private EmojIconActions emojIcon;
 
 
     @Override
@@ -67,6 +74,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         roomId = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID);
         String nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
+        emojiImageView = findViewById(R.id.emoji_btn);
+        rootView = findViewById(R.id.rootview);
 
         consersation = new Consersation();
         btnSend = (ImageButton) findViewById(R.id.btnSend);
@@ -81,7 +90,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             bitmapAvataUser = null;
         }
 
-        editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
+        editWriteMessage = findViewById(R.id.editWriteMessage);
+
+        emojIcon = new EmojIconActions(this, rootView, editWriteMessage, emojiImageView);
+        emojIcon.ShowEmojIcon();
+        emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
+        emojIcon.setKeyboardListener(new EmojIconActions.KeyboardListener() {
+            @Override
+            public void onKeyboardOpen() {
+                Log.e("TAGOpen", "Keyboard opened!");
+            }
+
+            @Override
+            public void onKeyboardClose() {
+                Log.e("TAGClose", "Keyboard closed");
+            }
+        });
+
         if (idFriend != null && nameFriend != null) {
             getSupportActionBar().setTitle(nameFriend);
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -268,23 +293,23 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 }
 
 class ItemMessageUserHolder extends RecyclerView.ViewHolder {
-    public TextView txtContent;
+    public EmojiconTextView txtContent;
     public CircleImageView avata;
 
     public ItemMessageUserHolder(View itemView) {
         super(itemView);
-        txtContent = (TextView) itemView.findViewById(R.id.textContentUser);
+        txtContent = itemView.findViewById(R.id.textContentUser);
         avata = (CircleImageView) itemView.findViewById(R.id.imageView2);
     }
 }
 
 class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
-    public TextView txtContent;
+    public EmojiconTextView txtContent;
     public CircleImageView avata;
 
     public ItemMessageFriendHolder(View itemView) {
         super(itemView);
-        txtContent = (TextView) itemView.findViewById(R.id.textContentFriend);
+        txtContent = itemView.findViewById(R.id.textContentFriend);
         avata = (CircleImageView) itemView.findViewById(R.id.imageView3);
     }
 }
