@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.koejahan.R;
+import com.android.koejahan.data.ProsesLogin;
 import com.android.koejahan.data.StaticConfig;
 
 import java.util.regex.Matcher;
@@ -28,7 +29,8 @@ public class RegisterActivity extends AppCompatActivity {
     CardView cvAdd;
     private final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    private EditText editTextUsername, editTextPassword, editTextRepeatPassword;
+    private final Pattern VALID_phone = Pattern.compile("^[0-9]{10,13}$", Pattern.CASE_INSENSITIVE);
+    private EditText editTextEmail, editTextPhoneNumber ;
     public static String STR_EXTRA_ACTION_REGISTER = "register";
 
     @Override
@@ -37,9 +39,8 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         cvAdd = (CardView) findViewById(R.id.cv_add);
-        editTextUsername = (EditText) findViewById(R.id.et_username);
-        editTextPassword = (EditText) findViewById(R.id.et_password);
-        editTextRepeatPassword = (EditText) findViewById(R.id.et_repeatpassword);
+        editTextEmail = (EditText) findViewById(R.id.ed_email);
+        editTextPhoneNumber = (EditText) findViewById(R.id.ed_phone);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ShowEnterAnimation();
         }
@@ -130,29 +131,32 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void clickRegister(View view) {
-        String username = editTextUsername.getText().toString();
-        String password = editTextPassword.getText().toString();
-        String repeatPassword = editTextRepeatPassword.getText().toString();
-        if(validate(username, password, repeatPassword)){
-            Intent data = new Intent();
-            data.putExtra(StaticConfig.STR_EXTRA_USERNAME, username);
-            data.putExtra(StaticConfig.STR_EXTRA_PASSWORD, password);
-            data.putExtra(StaticConfig.STR_EXTRA_ACTION, STR_EXTRA_ACTION_REGISTER);
-            setResult(RESULT_OK, data);
-            finish();
+        String email = editTextEmail.getText().toString();
+        String phone = "+62"+editTextPhoneNumber.getText().toString();
+        if(validate(email, editTextPhoneNumber.getText().toString())){
+            ProsesLogin setDaftar = new ProsesLogin();
+            if (setDaftar.initNewUserInfo(email,phone)){
+                Toast.makeText(this,"Berhasil Mendaftar !",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
+                startActivity(intent);
+            }else{
+                Toast.makeText(this,"Gagal Mendaftar, Coba lagi !",Toast.LENGTH_SHORT).show();
+            }
         }else {
-            Toast.makeText(this, "Invalid email or not match password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Invalid email or phone number !", Toast.LENGTH_SHORT).show();
         }
     }
 
     /**
      * Validate email, pass == re_pass
      * @param emailStr
-     * @param password
+     * @param phonenumber
      * @return
      */
-    private boolean validate(String emailStr, String password, String repeatPassword) {
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
-        return password.length() > 0 && repeatPassword.equals(password) && matcher.find();
+    private boolean validate(String emailStr, String phonenumber) {
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
+        Matcher matcherPhone = VALID_phone.matcher(phonenumber);
+        return (phonenumber.length() > 0 && !phonenumber.startsWith("08") && matcher.find() && matcherPhone.find());
     }
+
 }

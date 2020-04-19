@@ -72,6 +72,27 @@ public final class FriendDB {
         return listFriend;
     }
 
+    public ListFriend getListSpesifik(String id){
+        ListFriend listFriend = new ListFriend();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("select * from " + FeedEntry.TABLE_NAME + " WHERE friendID ='" + id + "'",null);
+            while (cursor.moveToNext()) {
+                Friend friend = new Friend();
+                friend.id = cursor.getString(0);
+                friend.name = cursor.getString(1);
+                friend.email = cursor.getString(2);
+                friend.idRoom = cursor.getString(3);
+                friend.avata = cursor.getString(4);
+                listFriend.getListFriend().add(friend);
+            }
+            cursor.close();
+        }catch (Exception e){
+            return new ListFriend();
+        }
+        return listFriend;
+    }
+
     public void dropDB(){
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.execSQL(SQL_DELETE_ENTRIES);

@@ -12,4 +12,5 @@ public class Message{
     public long timestamp;
     public String enc_key;
     public SecretKey skey;
+    public boolean isseen;
 }
